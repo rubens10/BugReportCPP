@@ -34,19 +34,19 @@ struct idx_id i_id[MAX];
 struct idx_num i_num[MAX];
 struct idx_string *raiz;
 
-void main (void);
-void Alterar (void);
-void Excluir (void);
-void Pesquisar (void);
-void Listar_Codigo (void);
+void main ();
+void Alterar ();
+void Excluir ();
+void Incluir ();
+void Pesquisar ();
+void Listar_Codigo ();
 void Listar_String (struct idx_string *idx);
-void Listar_Num (void);
-void Incluir (void);
-void Ordenar_Bubble (void);
-void Ordenar_Select (void);
-void Ordenar_Insert (void);
-void Ordenar_Quick (void);
-void Preencher_Automatico (void);
+void Listar_Num ();
+void Ordenar_Bubble ();
+void Ordenar_Select ();
+void Ordenar_Insert ();
+void Ordenar_Quick ();
+void Preencher_Automatico ();
 struct dado * Incluir_Registro (char *string, int num);
 struct dado * Pesquisar_String (char *string);
 struct dado * Pesquisar_Id (int id);
@@ -68,7 +68,6 @@ void inicializar()
 			i_num[i].num = (int) NULL;
 			i_num[i].x = (struct dado *) NULL;
 		}
-
 }
 
 void main() {
@@ -143,7 +142,7 @@ utilizando a função Mostrar_Registro. Em seguida, a função deverá solicitar ao u
 novos valores para os campos, e então chamar a função Alterar_Registro, passando como parâmetro: o
 endereço do registro a ser alterado juntamente com os novos valores. A função deverá informar ao usuário
 se a alteração foi feita com sucesso.*/
-	no * x;
+	struct dado * x;
     char * nome;
     char * data;
     printf("\nDigite o nome do projeto que deseja alterar");
@@ -211,7 +210,7 @@ void Pesquisar (){
 	}
 }
 
-struct dado * Incluir_Registro (char *string, int num){
+struct dado * Incluir_Registro (char nome, int num){
 	/*
 	A função Incluir_Registro deve receber como parâmetro os campos da entidade e armazenar esses dados
 	ao final da lista encadeada.
@@ -226,6 +225,7 @@ struct dado * Incluir_Registro (char *string, int num){
 	if(novo!=(struct dado*)NULL)
 	{
 		strcpy_s(novo->nome,nome);
+		novo->num = num;
 		novo->d=novo->e=(struct dado *)NULL;
 		if(raiz==(struct dado *)NULL)
 			raiz=novo;
