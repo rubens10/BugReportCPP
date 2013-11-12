@@ -9,7 +9,7 @@ struct dado {
 	int id;
 	char string[100];
 	int num;
-	struct dado *p;
+	struct dado *d, *e;
 };
 
 struct idx_id {
@@ -29,10 +29,10 @@ struct idx_string *i_string;
 	struct dado *x;
 };
 	
-struct dado *prim;
+struct dado *raiz;
 struct idx_id i_id[MAX];
 struct idx_num i_num[MAX];
-struct idx_string *raiz;
+struct idx_string *prim;
 
 void main ();
 void Alterar ();
@@ -52,13 +52,13 @@ struct dado * Pesquisar_String (char *string);
 struct dado * Pesquisar_Id (int id);
 void Mostrar_Registro (struct dado *x);
 int Alterar_Registro (struct dado *x, char *string, int num);
-int Excluir_Registro (struct dado *x);
+int Excluir_Registro (struct dado *x, char *string);
 void realocar_no(struct dado *, struct dado *);
 
 void inicializar()
 {
-		prim = (struct dado *) NULL;
-		raiz = (struct idx_string *) NULL;
+		raiz = (struct dado *) NULL;
+		prim = (struct idx_string *) NULL;
 
 		for (int i = 0; i < MAX; i++)
 		{
@@ -73,7 +73,7 @@ void inicializar()
 void main() {
 	char opcao;
     do{
-        //system("clear");
+		//system("clear");
         printf("\nBug Report - Projeto\n--------------------\n");
         printf("\nEscolha a opcao:");
         printf(" \n(1) Incluir");
@@ -83,13 +83,14 @@ void main() {
         printf(" \n(5) Listar por Ordem de Inclusao (sem ordenacao)");
         printf(" \n(6) Listar por Ordem de <<campo numerico>> (apos ordenacao)");
         printf(" \n(7) Listar por Ordem Alfabetica de <<campo string>> (em ordem, utilizando indice de string)");
-        printf(" \n(8) Recriar Índice numérico pelo Método Bubble Sort");
-        printf(" \n(9) Recriar Índice numérico pelo Método Selection Sort");
-        printf(" \n(10) Recriar Índice numérico pelo Método Insertion Sort");
-        printf(" \n(11) Recriar Índice numérico pelo Método QuickSort");
+        printf(" \n(8) Recriar indice numerico pelo Metodo Bubble Sort");
+        printf(" \n(9) Recriar indice numerico pelo Metodo Selection Sort");
+        printf(" \n(10) Recriar indice numerico pelo Metodo Insertion Sort");
+        printf(" \n(11) Recriar indice numerico pelo Metodo QuickSort");
         printf(" \n(12) Preenchimento Automatico");
         printf(" \n(0) Sair");
         printf(" \n-----\nSua opcao: [ ]\b\b");
+		fflush(stdin);
         opcao = getchar();
         switch(opcao) {
 			case '1':
@@ -111,19 +112,19 @@ void main() {
 				Listar_Num();
 				break;
 			case '7':
-				Listar_String();
+				Listar_String(prim);
 				break;
 			case '8':
-				Ordernar_Bubble();
+				Ordenar_Bubble();
 				break;
 			case '9':
-				Ordernar_Select();
+				Ordenar_Select();
 				break;
 			case '10':
 				Ordenar_Insert();
 				break;
 			case '11':
-				Ordernar_Quick();
+				Ordenar_Quick();
 				break;
 			case '12':
 				Preencher_Automatico();
@@ -135,26 +136,57 @@ void main() {
     }
     while (1);
 }
-void Alterar (){
-	/*A função Alterar deve permitir alterar os campos de um registro. A função deve solicitar ao usuário a
-digitação do campo string e localizar o registro a ser alterado utilizando a função Pesquisar_String e mostrálo,
-utilizando a função Mostrar_Registro. Em seguida, a função deverá solicitar ao usuário a digitação dos
-novos valores para os campos, e então chamar a função Alterar_Registro, passando como parâmetro: o
-endereço do registro a ser alterado juntamente com os novos valores. A função deverá informar ao usuário
-se a alteração foi feita com sucesso.*/
+
+void Incluir (){
+	/*A funÃ§Ã£o Incluir deve solicitar ao usuÃ¡rio a digitaÃ§Ã£o dos campos da entidade e armazenÃ¡-los na lista, atravÃ©s do uso da funÃ§Ã£o Incluir_Registro.
+	*/
+
 	struct dado * x;
-    char * nome;
-    char * data;
-    printf("\nDigite o nome do projeto que deseja alterar");
-    gets(*nome);
-    *x = Pesquisar_String(*nome);   
+    char nome[100];
+    int data = 0;
+    printf("\nDigite o nome do projeto que deseja incluir: ");
+	fflush(stdin);
+    gets(nome);
+    if(Pesquisar_String(nome) == (struct dado *)NULL){
    
-    printf("\nDigite o novo Nome:");
-    gets(*nome);
-    printf("\nDigite a nova Data:");
-    scanf("%d", &data);
+		printf("\nDigite a Data: ");
+		fflush(stdin);
+		scanf("%d", &data);
    
-    if(Alterar_Registro(x, *nome, *data) == 1){
+		if(Incluir_Registro(nome, data)){
+			puts("Inclusao feita com sucesso!");
+		}
+		else {
+			puts("Inclusao nao foi feita.");
+		}
+	}
+	else {
+		puts("Projeto ja existente!");
+	}
+}
+void Alterar (){
+	/*A funÃ§Ã£o Alterar deve permitir alterar os campos de um registro. A funÃ§Ã£o deve solicitar ao usuÃ¡rio a
+digitaÃ§Ã£o do campo string e localizar o registro a ser alterado utilizando a funÃ§Ã£o Pesquisar_String e mostrÃ¡lo,
+utilizando a funÃ§Ã£o Mostrar_Registro. Em seguida, a funÃ§Ã£o deverÃ¡ solicitar ao usuÃ¡rio a digitaÃ§Ã£o dos
+novos valores para os campos, e entÃ£o chamar a funÃ§Ã£o Alterar_Registro, passando como parÃ¢metro: o
+endereÃ§o do registro a ser alterado juntamente com os novos valores. A funÃ§Ã£o deverÃ¡ informar ao usuÃ¡rio
+se a alteraÃ§Ã£o foi feita com sucesso.*/
+	struct dado * x;
+    char nome[100];
+    int data = 0;
+    printf("\nDigite o nome do projeto que deseja alterar\n");
+    fflush(stdin);
+	gets(nome);
+    x = Pesquisar_String(nome);   
+   
+    printf("\nDigite o novo Nome: ");
+    fflush(stdin);
+	gets(nome);
+    printf("\nDigite a nova Data: ");
+    fflush(stdin);
+	scanf("%d", &data);
+   
+    if(Alterar_Registro(x, nome, data) == 1){
 		puts("Alteracao feita com sucesso!");
 	}
 	else {
@@ -163,87 +195,106 @@ se a alteração foi feita com sucesso.*/
 }
 void Excluir (){
 	/*
-A função Excluir deve permitir excluir um registro. A função deve solicitar ao usuário a digitação do campo
-string e localizar o registro a ser excluído utilizando a função Pesquisar_String e mostrá-lo, utilizando a
-função Mostrar_Registro. Em seguida, a função deverá chamar a função Excluir_Registro, passando como
-parâmetro o endereço do registro a ser excluído. A função deverá informar ao usuário se a exclusão foi feita
+A funÃ§Ã£o Excluir deve permitir excluir um registro. A funÃ§Ã£o deve solicitar ao usuÃ¡rio a digitaÃ§Ã£o do campo
+string e localizar o registro a ser excluÃ­do utilizando a funÃ§Ã£o Pesquisar_String e mostrÃ¡-lo, utilizando a
+funÃ§Ã£o Mostrar_Registro. Em seguida, a funÃ§Ã£o deverÃ¡ chamar a funÃ§Ã£o Excluir_Registro, passando como
+parÃ¢metro o endereÃ§o do registro a ser excluÃ­do. A funÃ§Ã£o deverÃ¡ informar ao usuÃ¡rio se a exclusÃ£o foi feita
 com sucesso.*/
-	
     struct dado * r;
-    char * nome;
-    printf("\nDigite o nome do projeto que deseja excluir.");
-    gets(*nome);
-	r = Pesquisar_String(*nome);
+    char nome[100];
+    printf("\nDigite o nome do projeto que deseja excluir.\n");
+    fflush(stdin);
+	gets(nome);
+	r = Pesquisar_String(nome);
 	
 	if(r == (struct dado *)NULL) {
 		puts("Nao foi possivel encontrar o projeto.");
 	}
 	else {
-		Mostrar_Registr(r);
-		Excluir_Registro(r);
+		Mostrar_Registro(r);
+		if(Excluir_Registro(r, nome) == 1) {
+			puts("Projeto excluido com sucesso!");
+		}
+		else {
+			puts("Nao foi possivel excluir o projeto.");
+		}
 	}
 }
 void Pesquisar (){
 	/*
-	A função Pesquisar deve apresentar um submenu ao usuário com duas opções de pesquisa: por id ou por
-	string. O usuário então preenche o id/string desejado para ser pesquisado e, através do uso concomitante
-	das funções Pesquisar_String/Pesquisar_Id e MostrarRegistro, devem ser apresentados os dados do
+	A funÃ§Ã£o Pesquisar deve apresentar um submenu ao usuÃ¡rio com duas opÃ§Ãµes de pesquisa: por id ou por
+	string. O usuÃ¡rio entÃ£o preenche o id/string desejado para ser pesquisado e, atravÃ©s do uso concomitante
+	das funÃ§Ãµes Pesquisar_String/Pesquisar_Id e MostrarRegistro, devem ser apresentados os dados do
 	registro encontrado.
 	*/
 	int opcao;
-	char string;
-	int id;
-	printf("\nDigite a opcao de pesquisa:"+
-		   "\n(0) Pesquisar por id"+
-		   "\n(1) Pesquisar por string");
-    scanf("%d", &opcao);
+	char string[100];
+	int id = 0;
+	struct dado * r;
+	printf("\nDigite a opcao de pesquisa:\n(0) Pesquisar por id\n(1) Pesquisar por string\n");
+    fflush(stdin);
+	scanf("%d", &opcao);
 
-	if(opcao == 0) {
-		printf("\nDigite o nome do projeto que deseja pesquisar");
+	if(opcao == 1) {
+		printf("\nDigite o nome do projeto que deseja pesquisar: ");
+		fflush(stdin);
 		gets(string);
-		MostrarRegistro(Pesquisar_String(string));
+		r = Pesquisar_String(string);
+		if(r != (struct dado *)NULL) {
+			Mostrar_Registro(r);
+		}
+		else {
+			puts("\nNao foi encontrado esse projeto.");
+		}
 	}
 	else {
-		printf("\nDigite o nome do projeto que deseja pesquisar");
+		printf("\nDigite o ID do projeto que deseja pesquisar: ");
+		fflush(stdin);
 		scanf("%d", &id);
-		MostrarRegistro(Pesquisar_Id(id));
+		r = Pesquisar_Id(id);
+		if(r != (struct dado *)NULL) {
+			Mostrar_Registro(r);
+		}
+		else {
+			puts("\nNao foi encontrado esse projeto.");
+		}
 	}
 }
 
-struct dado * Incluir_Registro (char nome, int num){
+struct dado * Incluir_Registro (char * nome, int num){
 	/*
-	A função Incluir_Registro deve receber como parâmetro os campos da entidade e armazenar esses dados
+	A funÃ§Ã£o Incluir_Registro deve receber como parÃ¢metro os campos da entidade e armazenar esses dados
 	ao final da lista encadeada.
-	- O campo string (cujo índice é armazenado na árvore binária) não pode se repetir no cadastro, sendo que
-	essa consistência deve ser feita mediante consulta ao referido índice;
-	- O campo chave primária deve ser gerado automaticamente, obtendo-se o maior código armazenado no
-	índice acrescido de 1 (um);
-	- O endereço de memória do novo registro deve ser incluído nos três índices.
-	- A função deverá retornar o endereço onde o registro foi alocado.*/
+	- O campo string (cujo Ã­ndice Ã© armazenado na Ã¡rvore binÃ¡ria) nÃ£o pode se repetir no cadastro, sendo que
+	essa consistÃªncia deve ser feita mediante consulta ao referido Ã­ndice;
+	- O campo chave primÃ¡ria deve ser gerado automaticamente, obtendo-se o maior cÃ³digo armazenado no
+	Ã­ndice acrescido de 1 (um);
+	- O endereÃ§o de memÃ³ria do novo registro deve ser incluÃ­do nos trÃªs Ã­ndices.
+	- A funÃ§Ã£o deverÃ¡ retornar o endereÃ§o onde o registro foi alocado.*/
 	struct dado *novo, *aux, *pai;
 	novo = (struct dado *)malloc(sizeof(struct dado));
 	if(novo!=(struct dado*)NULL)
 	{
-		strcpy_s(novo->nome,nome);
+		strcpy(novo->string,nome);
 		novo->num = num;
 		novo->d=novo->e=(struct dado *)NULL;
 		if(raiz==(struct dado *)NULL)
 			raiz=novo;
 		else
 		{
-			// A função abaixo pode ser usada no lugar
+			// A funÃ§Ã£o abaixo pode ser usada no lugar
 			// dos comandos deste bloco do else
 			// realocar_no(raiz,novo);
 			aux=raiz;
 			while(aux!=(struct dado *)NULL)
 			{
 				pai=aux;
-				if(strcmp(novo->nome,aux->nome)>=0)
+				if(strcmp(novo->string,aux->string)>=0)
 					aux=aux->d;
 				else
 					aux=aux->e;
 			}
-			if(strcmp(novo->nome,pai->nome)>=0)
+			if(strcmp(novo->string,pai->string)>=0)
 				pai->d = novo;
 			else
 				pai->e = novo;
@@ -252,79 +303,78 @@ struct dado * Incluir_Registro (char nome, int num){
 	return novo;
 }
 
-struct dado * Pesquisar_String (char *string){
-	return (struct dado *)NULL;
-}
-struct dado * Pesquisar_Id (int id){
-	return (struct dado *)NULL;
-}
-
 void Listar_Codigo (){
-	/*A função listar deve listar todos os registros, na ordem em que foram incluídos, percorrendo o índice de
-chave primária, e utilizando a função Mostrar_Registro.*/
+	/*A funÃ§Ã£o listar deve listar todos os registros, na ordem em que foram incluÃ­dos, percorrendo o Ã­ndice de
+chave primÃ¡ria, e utilizando a funÃ§Ã£o Mostrar_Registro.*/
 }
 
 void Listar_String (struct idx_string *idx){
-	/*A função Listar_String deve listar todos os registros em ordem alfabética crescente, percorrendo o índice do
-campo string e utilizando a função Mostrar_Registro.*/
+	/*A funÃ§Ã£o Listar_String deve listar todos os registros em ordem alfabÃ©tica crescente, percorrendo o Ã­ndice do
+campo string e utilizando a funÃ§Ã£o Mostrar_Registro.*/
 }
 
 void Listar_Num (){
-	/*A função Listar_Num deve listar todos os registros, percorrendo o índice do campo numérico e utilizando a
-função Mostrar_Registro*/
+	/*A funÃ§Ã£o Listar_Num deve listar todos os registros, percorrendo o Ã­ndice do campo numÃ©rico e utilizando a
+funÃ§Ã£o Mostrar_Registro*/
 }
 
 void Mostrar_Registro (struct dado *x){
-	/*A função Mostrar_Registro deve receber como parâmetro um ponteiro para struct dado e apresentar em
-	tela todos os campos da entidade, juntamente com o endereço que foi passado como parâmetro.*/
+	/*A funÃ§Ã£o Mostrar_Registro deve receber como parÃ¢metro um ponteiro para struct dado e apresentar em
+	tela todos os campos da entidade, juntamente com o endereÃ§o que foi passado como parÃ¢metro.*/
+
+	puts("Nome: ");
+	puts(x->string);
+	puts("\nData: ");
+	printf("%d", x->num);
+	puts("\n");
 }
 
 struct dado * Pesquisar_String (char *string){
-	/*A função Pesquisar_String deve receber o campo string como parâmetro, realizar uma pesquisa no índice
-	de árvore binária e retornar o endereço correspondente ao nome pesquisado.*/
+	/*A funÃ§Ã£o Pesquisar_String deve receber o campo string como parÃ¢metro, realizar uma pesquisa no Ã­ndice
+	de Ã¡rvore binÃ¡ria e retornar o endereÃ§o correspondente ao nome pesquisado.*/
 	return (struct dado *)NULL;
 }
 
 struct dado * Pesquisar_Id (int id){
 	/*
-	A função Pesquisar_Id deve receber o campo chave primária como parâmetro, realizar uma pesquisa
-	binária no referido índice de vetor e retornar o endereço correspondente ao id pesquisado.*/
+	A funÃ§Ã£o Pesquisar_Id deve receber o campo chave primÃ¡ria como parÃ¢metro, realizar uma pesquisa
+	binÃ¡ria no referido Ã­ndice de vetor e retornar o endereÃ§o correspondente ao id pesquisado.*/
 	return (struct dado *)NULL;
 }
 
 int Alterar_Registro (struct dado *x, char *string, int num){
-	/*A função Alterar_Registro deve permitir alterar os campos de um registro da lista encadeada, recebidos
-como parâmetro. Depois de alterados os dados, os índices devem ser atualizados (com exceção da chave
-primária) e a função deve retornar 1 ou 0 indicando se a alteração foi bem sucedida.
-Atenção: Alterar um nó de uma árvore binária significa remover o nó existente e incluir o novo nó,
+	/*A funÃ§Ã£o Alterar_Registro deve permitir alterar os campos de um registro da lista encadeada, recebidos
+como parÃ¢metro. Depois de alterados os dados, os Ã­ndices devem ser atualizados (com exceÃ§Ã£o da chave
+primÃ¡ria) e a funÃ§Ã£o deve retornar 1 ou 0 indicando se a alteraÃ§Ã£o foi bem sucedida.
+AtenÃ§Ã£o: Alterar um nÃ³ de uma Ã¡rvore binÃ¡ria significa remover o nÃ³ existente e incluir o novo nÃ³,
 para garantir a integridade da ordem!!!*/
 	return 1;
 }
 
-int Excluir_Registro (struct dado *x){
-	/*A função Excluir_Registro deve permitir excluir um registro da lista encadeada, sendo que a busca pelo
-registro a ser excluído deve ser feita pelo campo string, fazendo uso da função Pesquisar_String. Depois de
-excluído o registro, os três índices devem ser atualizados e a função deve retornar 1 ou 0 indicando se a
-alteração foi bem sucedida.*/
+int Excluir_Registro (struct dado *x, char * nome){
+	/*A funÃ§Ã£o Excluir_Registro deve permitir excluir um registro da lista encadeada, sendo que a busca pelo
+registro a ser excluÃ­do deve ser feita pelo campo string, fazendo uso da funÃ§Ã£o Pesquisar_String. Depois de
+excluÃ­do o registro, os trÃªs Ã­ndices devem ser atualizados e a funÃ§Ã£o deve retornar 1 ou 0 indicando se a
+alteraÃ§Ã£o foi bem sucedida.*/
 
-	struct no *aux, *pai, *exc;
+	struct dado *aux, *pai, *exc;
 	aux=raiz;
-	while(aux!=(struct no*)NULL && strcmp(aux->nome,nome)!=0)
+	while(aux!=(struct dado*)NULL && strcmp(aux->string,nome)!=0)
 	{
 		pai=aux;
-		if(strcmp(nome,aux->nome)>0)
+		if(strcmp(nome,aux->string)>0)
 			aux=aux->d;
 		else
 			aux=aux->e;
 	}
 	exc=aux;
-	// Como raiz não tem pai, o tratamento é diferente
+	// Como raiz nÃ£o tem pai, o tratamento Ã© diferente
 	if(exc==raiz)
 	{
-		if(raiz->d!=(struct no*)NULL)
+		if(raiz->d!=(struct dado*)NULL)
 		{
 			raiz=exc->d;
-			if(exc->e!=(struct no*)NULL)
+			if(exc->e!=(struct dado*)NULL)
 				realocar_no(raiz,exc->e);
 		}
 		else
@@ -333,41 +383,35 @@ alteração foi bem sucedida.*/
 	else
 	{
 		pai->d=exc->d;
-		if(exc->e!=(struct no*)NULL)
+		if(exc->e!=(struct dado*)NULL)
 			realocar_no(pai,exc->e);
 	}
 	//free(exc);
 	return 1;
 }
 
-void realocar_no(struct no *origem, struct no *destino)
+void realocar_no(struct dado *origem, struct dado *destino)
 {
-	struct no *aux, *pai;
+	struct dado *aux, *pai;
 	aux=origem;
-	while(aux!=(struct no*)NULL)
+	while(aux!=(struct dado*)NULL)
 	{
 		pai=aux;
-		if(strcmp(destino->nome,aux->nome)>=0)
+		if(strcmp(destino->string,aux->string)>=0)
 			aux=aux->d;
 		else
 			aux=aux->e;
 	}
-	if(strcmp(destino->nome,pai->nome)>=0)
+	if(strcmp(destino->string,pai->string)>=0)
 		pai->d = destino;
 	else
 		pai->e = destino;
 }
 
-void Incluir (){
-	/*A função Incluir deve solicitar ao usuário a digitação dos campos da entidade e armazená-los na lista,
-	através do uso da função Incluir_Registro.
-	*/
-}
-
 /*Ordenar_Bubble, Ordenar_Selection, Ordenar_Insertion, Ordenar_Quick
-Essas funções devem ordenar o índice numérico pelo método correspondente, sendo que, ao final do
-processo de ordenação, deverá ser informado ao usuário quantos milissegundos levou o processo de
-ordenação. O objetivo é comparar a eficiência dos métodos.*/
+Essas funÃ§Ãµes devem ordenar o Ã­ndice numÃ©rico pelo mÃ©todo correspondente, sendo que, ao final do
+processo de ordenaÃ§Ã£o, deverÃ¡ ser informado ao usuÃ¡rio quantos milissegundos levou o processo de
+ordenaÃ§Ã£o. O objetivo Ã© comparar a eficiÃªncia dos mÃ©todos.*/
 void Ordenar_Bubble (){
 }
 void Ordenar_Select (){
@@ -378,7 +422,7 @@ void Ordenar_Quick (){
 }
 void Preencher_Automatico (){
 	/*
-	A função PreencherAutomatico deve gerar MAX registros com valores aleatórios para os campos da
-entidade (com exceção da chave primária), e inseri-los na lista, fazendo uso da função Incluir_Registro.
+	A funÃ§Ã£o PreencherAutomatico deve gerar MAX registros com valores aleatÃ³rios para os campos da
+entidade (com exceÃ§Ã£o da chave primÃ¡ria), e inseri-los na lista, fazendo uso da funÃ§Ã£o Incluir_Registro.
 */
 }
